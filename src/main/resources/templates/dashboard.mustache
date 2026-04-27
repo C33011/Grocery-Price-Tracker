@@ -19,6 +19,30 @@
     </tr>
     {{/featuredProducts}}
 </table>
+<h3>Price Alerts</h3>
+<p>These products are currently priced below their 12-month average!</p>
+<table border="1">
+    <tr>
+        <th>Product</th>
+        <th>Store</th>
+        <th>Chain</th>
+        <th>Current Price</th>
+        <th>Avg Price</th>
+        <th>% Below Avg</th>
+        <th>Detail</th>
+    </tr>
+    {{#priceAlerts}}
+    <tr>
+        <td>{{productName}}</td>
+        <td>{{storeName}}</td>
+        <td>{{chain}}</td>
+        <td>${{currentPrice}}</td>
+        <td>${{avgPrice}}</td>
+        <td>{{pctBelowAvg}}% off</td>
+        <td><a href="/products/{{productId}}">View</a></td>
+    </tr>
+    {{/priceAlerts}}
+</table>
 {{> fragments/footer}}
 </body>
 </html>
