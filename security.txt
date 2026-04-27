@@ -1,0 +1,17 @@
+Password Security Approach
+==========================
+
+
+We use BCryptPasswordEncoder to securely store user passwords.
+
+
+Registration:
+
+     When a user registers, the UserService encrypts the plaintext password using BCrypt, which is
+a one-way hashing algorithm with a built-in salt, before inserting the value into the database.
+
+
+Login:
+
+     When a user logs in, the plaintext password submitted is verified using the BCrypt's matches method, which encrypts the input and compares it to the stored encrypted value. The stored (original)
+password is never exposed or recovered.
