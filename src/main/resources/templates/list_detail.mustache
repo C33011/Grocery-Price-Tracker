@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+{{> fragments/html_header}}
+<body>
+{{> fragments/nav}}
+{{#list}}
+<h2>{{listName}}</h2>
+{{/list}}
+{{> fragments/error_message}}
+<h3>Add Item</h3>
+<form method="post" action="/lists/{{listId}}/add">
+    <select name="productId">
+        {{#allProducts}}
+        <option value="{{productId}}">{{productName}}</option>
+        {{/allProducts}}
+    </select>
+    <input name="quantity" type="number" value="1" min="1">
+    <button type="submit">Add</button>
+</form>
+<h3>Items</h3>
+<table border="1">
+    <tr><th>Product</th><th>Qty</th><th>Checked</th><th>Actions</th></tr>
+    {{#items}}
+    <tr>
+        <td>{{productName}}</td>
+        <td>{{quantity}}</td>
+        <td>{{#checked}}Yes{{/checked}}{{^checked}}No{{/checked}}</td>
+        <td>
+            <form method="post" action="/lists/{{listId}}/check" style="display:inline">
+                <input type="hidden" name="itemId" value="{{itemId}}">
+                <input type="hidden" name="checked" value="{{^checked}}true{{/checked}}{{#checked}}false{{/checked}}">
+                <button type="submit">Toggle</button>
+            </form>
+            <form method="post" action="/lists/{{listId}}/remove" style="display:inline">
+                <input type="hidden" name="itemId" value="{{itemId}}">
+                <button type="submit">Remove</button>
+            </form>
+        </td>
+    </tr>
+    {{/items}}
+</table>
+<a href="/lists">Back to Lists</a>
+{{> fragments/footer}}
+</body>
+</html>
