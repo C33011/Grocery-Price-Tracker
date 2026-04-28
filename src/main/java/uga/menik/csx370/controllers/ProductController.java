@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import uga.menik.csx370.models.PriceRecord;
 import uga.menik.csx370.models.Product;
 import uga.menik.csx370.services.UserService;
+import uga.menik.csx370.models.ShoppingList;
 
 @Controller
 @RequestMapping("/products")
@@ -36,17 +38,31 @@ public class ProductController {
     @GetMapping
     public ModelAndView productList(
             @RequestParam(name = "search", required = false, defaultValue = "") String search,
+            @RequestParam(name = "chain", required = false, defaultValue = "") String chain,
             @RequestParam(name = "category", required = false, defaultValue = "") String category) {
         ModelAndView mv = new ModelAndView("products");
         mv.addObject("loggedInUser", userService.getLoggedInUser());
         mv.addObject("search", search);
         mv.addObject("category", category);
+        mv.addObject("chain", chain);
         List<Product> products = new ArrayList<>();
         try (Connection conn = dataSource.getConnection()) {
-            String sql = "SELECT * FROM products WHERE product_name LIKE ? AND category LIKE ? ORDER BY product_name";
+            String sql;
+            if(chain.isEmpty()){ 
+                sql = "SELECT * FROM products WHERE product_name LIKE ? AND category LIKE ? ORDER BY product_name";
+            }else{
+                sql = "SELECT DISTINCT p.* FROM products p " +
+              "JOIN price_records pr ON p.product_id = pr.product_id " +
+              "JOIN stores s ON pr.store_id = s.store_id " +
+              "WHERE p.product_name LIKE ? AND p.category LIKE ? AND s.chain LIKE ? " +
+              "ORDER BY p.product_name";
+            }
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, "%" + search + "%");
                 pstmt.setString(2, "%" + category + "%");
+                if(!chain.isEmpty()){
+                    pstmt.setString(3, "%" + chain + "%");
+                }
                 try (ResultSet rs = pstmt.executeQuery()) {
                     while (rs.next()) {
                         products.add(new Product(
@@ -64,7 +80,53 @@ public class ProductController {
             mv.addObject("errorMessage", e.getMessage());
         }
         mv.addObject("products", products);
+        
+        List<ShoppingList> userLists = new ArrayList<>();
+        String listSql = "SELECT list_id, list_name FROM shopping_lists WHERE user_id = ? AND is_active = 1";
+        try(Connection conn = dataSource.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(listSql)){
+                pstmt.setInt(1, Integer.parseInt(userService.getLoggedInUser().getUserId()));
+                try (ResultSet rs = pstmt.executeQuery()){
+                    while(rs.next()){
+                        userLists.add(new ShoppingList(
+                            rs.getInt("list_id"),
+                            Integer.parseInt(userService.getLoggedInUser().getUserId()),
+                            rs.getString("list_name"),
+                            null,
+                            true
+                        ));
+                    }
+                }
+        }catch (Exception e){
+            mv.addObject("errorMessage", e.getMessage());
+        }
+        mv.addObject("userLists", userLists);
+
         return mv;
+    }
+
+    @PostMapping("/addToList")
+    public String addToList(
+        @RequestParam("listId") int listId,
+        @RequestParam(name = "productId", required=false) List<Integer> productIds)
+    {
+        if(productIds == null ||productIds.isEmpty()){
+            return "redirect:/products";
+        }
+        String sql = "INSERT INTO list_items (list_id, product_id, quantity) VALUES (?, ?, 1) " +
+                     "ON DUPLICATE KEY UPDATE quantity = quantity + 1";
+        try (Connection conn = dataSource.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)){
+                for (int productId : productIds){
+                    pstmt.setInt(1, listId);
+                    pstmt.setInt(2, productId);
+                    pstmt.executeUpdate();
+                }
+        } catch (Exception e){
+            String message = java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8);
+            return "redirect:/products?error=" + message;
+        }
+        return "redirect:/products";
     }
 
     @GetMapping("/{id}")
