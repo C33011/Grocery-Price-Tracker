@@ -78,5 +78,5 @@ CREATE TABLE IF NOT EXISTS posts (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_price_product_date ON price_records (product_id, price_date);
-CREATE INDEX IF NOT EXISTS idx_user_email ON users (email);
+CREATE INDEX idx_price_product_date ON price_records (product_id, price_date);
+CREATE INDEX idx_shopping_lists_user_created ON shopping_lists (user_id, created_at);
