@@ -67,6 +67,10 @@ public class ListController {
 
     @PostMapping("/create")
     public String createList(@RequestParam("listName") String listName) {
+        if(listName == null || listName.trim().isEmpty()){
+            String message = URLEncoder.encode("List name cannot be empty.", StandardCharsets.UTF_8);
+            return "redirect:/lists?error=" + message;
+        }
         int userId = Integer.parseInt(userService.getLoggedInUser().getUserId());
         try (Connection conn = dataSource.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(
