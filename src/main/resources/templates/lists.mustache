@@ -5,8 +5,9 @@
 {{> fragments/nav}}
 <h2>My Shopping Lists</h2>
 {{> fragments/error_message}}
-<form method="post" action="/lists/create">
-    <input name="listName" type="text" placeholder="New list name">
+<form method="post" action="/lists/create" 
+        onsubmit="return document.querySelector('[name=listName]').value.trim() !== '' || alert('Please enter a list name.')">
+    <input name="listName" type="text" placeholder="New list name" required>
     <button type="submit">Create List</button>
 </form>
 <ul>
