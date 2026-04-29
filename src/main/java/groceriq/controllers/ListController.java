@@ -67,6 +67,10 @@ public class ListController {
 
     @PostMapping("/create")
     public String createList(@RequestParam("listName") String listName) {
+        if(listName == null || listName.trim().isEmpty()){
+            String message = URLEncoder.encode("List name cannot be empty.", StandardCharsets.UTF_8);
+            return "redirect:/lists?error=" + message;
+        }
         int userId = Integer.parseInt(userService.getLoggedInUser().getUserId());
         try (Connection conn = dataSource.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(
@@ -79,6 +83,22 @@ public class ListController {
             return "redirect:/lists?error=" + message;
         }
         return "redirect:/lists";
+    }
+
+    @PostMapping("/{id}/archive")
+    public String archiveList(@PathVariable("id") int listId){
+        int userId = Integer.parseInt(userService.getLoggedInUser().getUserId());
+        try (Connection conn = dataSource.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(
+                    "UPDATE shopping_lists SET is_active = 0 WHERE list_id = ? AND user_id = ?")){
+            pstmt.setInt(1, listId);
+            pstmt.setInt(2, userId);
+            pstmt.executeUpdate();
+        } catch (Exception e){
+            String message = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/lists?error="+message;
+        }
+        return "redirect:/lists";  
     }
 
     @GetMapping("/{id}")
