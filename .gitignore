@@ -1,1 +1,4 @@
 /target/
+backend/target/
+.codex
+package-lock.json
