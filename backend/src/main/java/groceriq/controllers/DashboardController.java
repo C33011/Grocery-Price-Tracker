@@ -5,21 +5,23 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.RestController;
 
 import groceriq.models.PriceAlert;
 import groceriq.models.Product;
 import groceriq.services.UserService;
 
-@Controller
-@RequestMapping("/")
+@RestController
+@RequestMapping("/api/dashboard")
 public class DashboardController {
 
     private final UserService userService;
@@ -32,10 +34,7 @@ public class DashboardController {
     }
 
     @GetMapping
-    public ModelAndView webpage() {
-        ModelAndView mv = new ModelAndView("dashboard");
-        mv.addObject("loggedInUser", userService.getLoggedInUser());
-        
+    public ResponseEntity<?> dashboard() {
         //Featured Products
         List<Product> featuredProducts = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
@@ -54,9 +53,9 @@ public class DashboardController {
                 }
             }
         } catch (Exception e) {
-            mv.addObject("errorMessage", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
         }
-        mv.addObject("featuredProducts", featuredProducts);
 
         //Price Alerts
         List<PriceAlert> priceAlerts = new ArrayList<>();
@@ -106,10 +105,13 @@ public class DashboardController {
                 }
             }
         } catch (Exception e) {
-            mv.addObject("errorMessage", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
         }
-        mv.addObject("priceAlerts", priceAlerts);
 
-        return mv;
+        return ResponseEntity.ok(Map.of(
+                "loggedInUser", userService.getLoggedInUser(),
+                "featuredProducts", featuredProducts,
+                "priceAlerts", priceAlerts));
     }
 }

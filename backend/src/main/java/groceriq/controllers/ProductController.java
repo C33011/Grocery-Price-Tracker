@@ -5,26 +5,29 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.bind.annotation.PostMapping;
 
 
 import groceriq.models.PriceRecord;
 import groceriq.models.Product;
+import groceriq.models.ShoppingList;
 import groceriq.services.UserService;
-import groceriq.services.ShoppingList;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
-@RequestMapping("/products")
+@RestController
+@RequestMapping("/api/products")
 public class ProductController {
 
     private final UserService userService;
@@ -37,15 +40,10 @@ public class ProductController {
     }
 
     @GetMapping
-    public ModelAndView productList(
+    public ResponseEntity<?> productList(
             @RequestParam(name = "search", required = false, defaultValue = "") String search,
             @RequestParam(name = "chain", required = false, defaultValue = "") String chain,
             @RequestParam(name = "category", required = false, defaultValue = "") String category) {
-        ModelAndView mv = new ModelAndView("products");
-        mv.addObject("loggedInUser", userService.getLoggedInUser());
-        mv.addObject("search", search);
-        mv.addObject("category", category);
-        mv.addObject("chain", chain);
         List<Product> products = new ArrayList<>();
         try (Connection conn = dataSource.getConnection()) {
             String sql;
@@ -78,9 +76,9 @@ public class ProductController {
                 }
             }
         } catch (Exception e) {
-            mv.addObject("errorMessage", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
         }
-        mv.addObject("products", products);
         
         List<ShoppingList> userLists = new ArrayList<>();
         String listSql = "SELECT list_id, list_name FROM shopping_lists WHERE user_id = ? AND is_active = 1";
@@ -99,57 +97,63 @@ public class ProductController {
                     }
                 }
         }catch (Exception e){
-            mv.addObject("errorMessage", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
         }
-        mv.addObject("userLists", userLists);
 
-        return mv;
+        return ResponseEntity.ok(Map.of(
+                "loggedInUser", userService.getLoggedInUser(),
+                "search", search,
+                "category", category,
+                "chain", chain,
+                "products", products,
+                "userLists", userLists));
     }
 
-    @PostMapping("/addToList")
-    public String addToList(
-        @RequestParam("listId") int listId,
-        @RequestParam(name = "productId", required=false) List<Integer> productIds)
+    @PostMapping("/add-to-list")
+    public ResponseEntity<?> addToList(@RequestBody AddToListRequest request)
     {
-        if(productIds == null ||productIds.isEmpty()){
-            return "redirect:/products";
+        if(request.productIds() == null || request.productIds().isEmpty()){
+            return ResponseEntity.badRequest().body(Map.of("error", "Select at least one product."));
         }
         String sql = "INSERT INTO list_items (list_id, product_id, quantity) VALUES (?, ?, 1) " +
                      "ON DUPLICATE KEY UPDATE quantity = quantity + 1";
         try (Connection conn = dataSource.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)){
-                for (int productId : productIds){
-                    pstmt.setInt(1, listId);
+                for (int productId : request.productIds()){
+                    pstmt.setInt(1, request.listId());
                     pstmt.setInt(2, productId);
                     pstmt.executeUpdate();
                 }
         } catch (Exception e){
-            String message = java.net.URLEncoder.encode(e.getMessage(), java.nio.charset.StandardCharsets.UTF_8);
-            return "redirect:/products?error=" + message;
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
         }
-        return "redirect:/products";
+        return ResponseEntity.ok(Map.of("message", "Products added"));
     }
 
     @GetMapping("/{id}")
-    public ModelAndView productDetail(@PathVariable("id") int productId) {
-        ModelAndView mv = new ModelAndView("product_detail");
-        mv.addObject("loggedInUser", userService.getLoggedInUser());
+    public ResponseEntity<?> productDetail(@PathVariable("id") int productId) {
+        Product product = null;
         try (Connection conn = dataSource.getConnection()) {
             try (PreparedStatement pstmt = conn.prepareStatement(
                     "SELECT * FROM products WHERE product_id = ?")) {
                 pstmt.setInt(1, productId);
                 try (ResultSet rs = pstmt.executeQuery()) {
                     if (rs.next()) {
-                        mv.addObject("product", new Product(
+                        product = new Product(
                             rs.getInt("product_id"),
                             rs.getString("product_name"),
                             rs.getString("category"),
                             rs.getString("brand"),
                             rs.getBigDecimal("unit_size"),
                             rs.getString("unit_type")
-                        ));
+                        );
                     }
                 }
+            }
+            if (product == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Product not found."));
             }
             String pricesSql =
                 "SELECT pr.record_id, pr.product_id, pr.store_id, s.store_name, s.chain, " +
@@ -176,11 +180,15 @@ public class ProductController {
                     }
                 }
             }
-            mv.addObject("prices", prices);
+            return ResponseEntity.ok(Map.of(
+                    "loggedInUser", userService.getLoggedInUser(),
+                    "product", product,
+                    "prices", prices));
         } catch (Exception e) {
-            mv.addObject("errorMessage", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
         }
-        return mv;
     }
-}
 
+    public record AddToListRequest(int listId, List<Integer> productIds) {}
+}

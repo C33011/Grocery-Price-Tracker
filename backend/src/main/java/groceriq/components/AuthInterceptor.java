@@ -22,7 +22,13 @@ public class AuthInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request,
             HttpServletResponse response, Object handler) throws Exception {
         if (!userService.isAuthenticated()) {
-            response.sendRedirect("/login");
+            if (request.getRequestURI().startsWith("/api/")) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\":\"Unauthorized\"}");
+            } else {
+                response.sendRedirect("/login");
+            }
             return false;
         }
         return true;

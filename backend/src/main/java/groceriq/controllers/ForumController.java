@@ -1,28 +1,28 @@
 package groceriq.controllers;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.RestController;
 
 import groceriq.models.ForumPost;
 import groceriq.services.UserService;
 
-@Controller
-@RequestMapping("/forum")
+@RestController
+@RequestMapping("/api/forum")
 public class ForumController {
 
     private final UserService userService;
@@ -35,10 +35,7 @@ public class ForumController {
     }
 
     @GetMapping
-    public ModelAndView forumPage(@RequestParam(name = "error", required = false) String error) {
-        ModelAndView mv = new ModelAndView("forum");
-        mv.addObject("loggedInUser", userService.getLoggedInUser());
-        mv.addObject("errorMessage", error);
+    public ResponseEntity<?> forumPage() {
         List<ForumPost> posts = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(
@@ -58,27 +55,30 @@ public class ForumController {
                 }
             }
         } catch (Exception e) {
-            mv.addObject("errorMessage", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
         }
-        mv.addObject("posts", posts);
-        return mv;
+        return ResponseEntity.ok(Map.of(
+                "loggedInUser", userService.getLoggedInUser(),
+                "posts", posts));
     }
 
-    @PostMapping("/create")
-    public String createPost(@RequestParam("title") String title,
-            @RequestParam("body") String body) {
+    @PostMapping
+    public ResponseEntity<?> createPost(@RequestBody CreatePostRequest request) {
         int userId = Integer.parseInt(userService.getLoggedInUser().getUserId());
         try (Connection conn = dataSource.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(
                         "INSERT INTO posts (user_id, title, body) VALUES (?, ?, ?)")) {
             pstmt.setInt(1, userId);
-            pstmt.setString(2, title);
-            pstmt.setString(3, body);
+            pstmt.setString(2, request.title());
+            pstmt.setString(3, request.body());
             pstmt.executeUpdate();
         } catch (Exception e) {
-            String message = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
-            return "redirect:/forum?error=" + message;
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", e.getMessage()));
         }
-        return "redirect:/forum";
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Post created"));
     }
+
+    public record CreatePostRequest(String title, String body) {}
 }
