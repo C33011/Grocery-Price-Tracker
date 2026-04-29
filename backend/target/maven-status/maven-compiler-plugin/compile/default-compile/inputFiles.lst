@@ -1,0 +1,17 @@
+/home/emmanuel/Programming/DBMS/GroceryPriceTracker/Grocery-Price-Tracker/src/main/java/groceriq/models/ForumPost.java
+/home/emmanuel/Programming/DBMS/GroceryPriceTracker/Grocery-Price-Tracker/src/main/java/groceriq/components/AuthInterceptor.java
+/home/emmanuel/Programming/DBMS/GroceryPriceTracker/Grocery-Price-Tracker/src/main/java/groceriq/controllers/ForumController.java
+/home/emmanuel/Programming/DBMS/GroceryPriceTracker/Grocery-Price-Tracker/src/main/java/groceriq/App.java
+/home/emmanuel/Programming/DBMS/GroceryPriceTracker/Grocery-Price-Tracker/src/main/java/groceriq/controllers/DashboardController.java
+/home/emmanuel/Programming/DBMS/GroceryPriceTracker/Grocery-Price-Tracker/src/main/java/groceriq/controllers/ListController.java
+/home/emmanuel/Programming/DBMS/GroceryPriceTracker/Grocery-Price-Tracker/src/main/java/groceriq/models/PriceRecord.java
+/home/emmanuel/Programming/DBMS/GroceryPriceTracker/Grocery-Price-Tracker/src/main/java/groceriq/models/PriceAlert.java
+/home/emmanuel/Programming/DBMS/GroceryPriceTracker/Grocery-Price-Tracker/src/main/java/groceriq/models/ListItem.java
+/home/emmanuel/Programming/DBMS/GroceryPriceTracker/Grocery-Price-Tracker/src/main/java/groceriq/models/User.java
+/home/emmanuel/Programming/DBMS/GroceryPriceTracker/Grocery-Price-Tracker/src/main/java/groceriq/models/Product.java
+/home/emmanuel/Programming/DBMS/GroceryPriceTracker/Grocery-Price-Tracker/src/main/java/groceriq/config/WebConfig.java
+/home/emmanuel/Programming/DBMS/GroceryPriceTracker/Grocery-Price-Tracker/src/main/java/groceriq/controllers/LoginController.java
+/home/emmanuel/Programming/DBMS/GroceryPriceTracker/Grocery-Price-Tracker/src/main/java/groceriq/controllers/RegistrationController.java
+/home/emmanuel/Programming/DBMS/GroceryPriceTracker/Grocery-Price-Tracker/src/main/java/groceriq/models/ShoppingList.java
+/home/emmanuel/Programming/DBMS/GroceryPriceTracker/Grocery-Price-Tracker/src/main/java/groceriq/controllers/ProductController.java
+/home/emmanuel/Programming/DBMS/GroceryPriceTracker/Grocery-Price-Tracker/src/main/java/groceriq/services/UserService.java

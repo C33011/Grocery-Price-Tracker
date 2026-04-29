@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+{{> fragments/html_header}}
+<body>
+{{> fragments/nav}}
+{{> fragments/error_message}}
+{{#product}}
+<h2>{{productName}}</h2>
+<p>Category: {{category}}</p>
+<p>Brand: {{brand}}</p>
+<p>Size: {{unitSize}} {{unitType}}</p>
+{{/product}}
+<h3>Price History</h3>
+<table border="1">
+    <tr><th>Store</th><th>Chain</th><th>Price</th><th>Reg Price</th><th>On Sale</th><th>Date</th></tr>
+    {{#prices}}
+    <tr>
+        <td>{{storeName}}</td>
+        <td>{{chain}}</td>
+        <td>${{price}}</td>
+        <td>${{regPrice}}</td>
+        <td>{{#sale}}Yes{{/sale}}{{^sale}}No{{/sale}}</td>
+        <td>{{priceDate}}</td>
+    </tr>
+    {{/prices}}
+</table>
+<a href="/products">Back to Products</a>
+{{> fragments/footer}}
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+{{> fragments/html_header}}
+<body>
+{{> fragments/nav}}
+<h2>My Shopping Lists</h2>
+{{> fragments/error_message}}
+<form method="post" action="/lists/create" 
+        onsubmit="return document.querySelector('[name=listName]').value.trim() !== '' || alert('Please enter a list name.')">
+    <input name="listName" type="text" placeholder="New list name" required>
+    <button type="submit">Create List</button>
+</form>
+
+<h3>Active Lists</h3>
+<ul>
+    {{#lists}}
+    {{#active}}
+    <li>
+        <a href="/lists/{{listId}}">{{listName}}</a> ({{createdAt}})
+        <form method="post" action="/lists/{{listId}}/archive" style="display:inline">
+        <button type="submit">Archive</button>
+        </form>
+    </li>
+    {{/active}}
+    {{/lists}}
+</ul>
+
+<h3>Archived Lists</h3>
+<ul>
+    {{#lists}}
+    {{^active}}
+    <li>
+        {{listName}} ({{createdAt}})
+    </li>
+    {{/active}}
+    {{/lists}}
+</ul>
+
+{{> fragments/footer}}
+</body>
+</html>

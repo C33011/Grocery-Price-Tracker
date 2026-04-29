@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+{{> fragments/html_header}}
+<body>
+{{> fragments/nav}}
+<h2>Products</h2>
+{{> fragments/error_message}}
+<form method="get" action="/products">
+    <input name="search" type="text" placeholder="Search by name" value="{{search}}">
+    <input name="category" type="text" placeholder="Category" value="{{category}}">
+    <input name="chain" type="text" placeholder="Filter by chain (Walmart, Kroger, etc.)" value="{{chain}}" size="30">
+    <button type="submit">Search</button>
+</form>
+<form method="post" action="/products/addToList">
+<table border="1">
+    <tr><th>Select</th><th>Name</th><th>Category</th><th>Brand</th><th>Size</th><th>Detail</th></tr>
+    {{#products}}
+    <tr>
+        <td><input type="checkbox" name="productId" value="{{productId}}"></td>
+        <td>{{productName}}</td>
+        <td>{{category}}</td>
+        <td>{{brand}}</td>
+        <td>{{unitSize}} {{unitType}}</td>
+        <td><a href="/products/{{productId}}">View</a></td>
+    </tr>
+    {{/products}}
+</table>
+
+<h3>Add to Shopping List</h3>
+{{#userLists}}
+{{#-first}}
+<select name="listId">
+{{/-first}}
+    <option value="{{listId}}">{{listName}}</option>
+{{#-last}}
+</select>
+{{/-last}}
+{{/userLists}}
+<button type="submit"> Add Select to List</button>
+</form>
+
+{{> fragments/footer}}
+</body>
+</html>
