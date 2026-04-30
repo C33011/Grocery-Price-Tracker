@@ -1,0 +1,36 @@
+.state {
+  display: inline-flex;
+  align-items: center;
+  justify-self: center;
+  align-self: center;
+  gap: var(--space-3);
+  width: fit-content;
+  max-width: 100%;
+  padding: var(--space-4);
+}
+
+.dot {
+  width: 0.72rem;
+  height: 0.72rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--color-plum);
+}
+
+.copy {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.copy strong {
+  color: var(--color-ink);
+  font-size: 0.98rem;
+  line-height: 1.15;
+}
+
+.copy span {
+  color: var(--color-muted);
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.2;
+}

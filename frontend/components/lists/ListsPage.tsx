@@ -1,14 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { isUnauthorizedError } from "@/lib/api";
 import { archiveList, createList, getLists } from "@/services/lists";
 import type { ListsData } from "@/types/lists";
 import ErrorMessage from "@/components/shared/ErrorMessage";
-import Nav from "@/components/shared/Nav";
-import styles from "./ListsPage.module.css";
+import LoadingState from "@/components/shared/LoadingState";
+import PageShell from "@/components/shared/PageShell";
+import CreateListForm from "./CreateListForm";
+import ListCollection from "./ListCollection";
 
 export default function ListsPage() {
   const router = useRouter();
@@ -68,10 +69,10 @@ export default function ListsPage() {
 
   if (!data) {
     return (
-      <main className={styles.page}>
+      <PageShell>
         <ErrorMessage message={error} />
-        {!error && <p>Loading...</p>}
-      </main>
+        {!error && <LoadingState title="Loading lists" />}
+      </PageShell>
     );
   }
 
@@ -79,43 +80,29 @@ export default function ListsPage() {
   const archivedLists = data.lists.filter((list) => !list.active);
 
   return (
-    <main className={styles.page}>
-      <Nav />
-      <h2>My Shopping Lists</h2>
+    <PageShell
+      eyebrow="Lists"
+      title="Shopping lists"
+      subtitle="Create focused grocery runs and archive lists when the work is done."
+    >
       <ErrorMessage message={error} />
-
-      <form onSubmit={handleCreate}>
-        <input
-          name="listName"
-          type="text"
-          placeholder="New list name"
-          value={listName}
-          onChange={(event) => setListName(event.target.value)}
-          required
-        />
-        <button type="submit">Create List</button>
-      </form>
-
-      <h3>Active Lists</h3>
-      <ul>
-        {activeLists.map((list) => (
-          <li key={list.listId}>
-            <Link href={`/lists/${list.listId}`}>{list.listName}</Link> ({list.createdAt}){" "}
-            <button type="button" onClick={() => handleArchive(list.listId)}>
-              Archive
-            </button>
-          </li>
-        ))}
-      </ul>
-
-      <h3>Archived Lists</h3>
-      <ul>
-        {archivedLists.map((list) => (
-          <li key={list.listId}>
-            {list.listName} ({list.createdAt})
-          </li>
-        ))}
-      </ul>
-    </main>
+      <CreateListForm
+        listName={listName}
+        onListNameChange={setListName}
+        onSubmit={handleCreate}
+      />
+      <ListCollection
+        title="Active lists"
+        description="Open lists that are still ready for edits and grocery planning."
+        lists={activeLists}
+        onArchive={handleArchive}
+      />
+      <ListCollection
+        title="Archived lists"
+        description="Past grocery runs kept for reference."
+        lists={archivedLists}
+        archived
+      />
+    </PageShell>
   );
 }

@@ -12,8 +12,10 @@ import {
 } from "@/services/list-detail";
 import type { ListDetailData } from "@/types/list-detail";
 import ErrorMessage from "@/components/shared/ErrorMessage";
-import Nav from "@/components/shared/Nav";
-import styles from "./ListDetailPage.module.css";
+import LoadingState from "@/components/shared/LoadingState";
+import PageShell from "@/components/shared/PageShell";
+import AddItemForm from "./AddItemForm";
+import ListItemCollection from "./ListItemCollection";
 
 type ListDetailPageProps = {
   listId: number;
@@ -99,74 +101,32 @@ export default function ListDetailPage({ listId }: ListDetailPageProps) {
 
   if (!data) {
     return (
-      <main className={styles.page}>
+      <PageShell>
         <ErrorMessage message={error} />
-        {!error && <p>Loading...</p>}
-      </main>
+        {!error && <LoadingState title="Loading list details" />}
+      </PageShell>
     );
   }
 
   return (
-    <main className={styles.page}>
-      <Nav />
-      <h2>{data.list.listName}</h2>
+    <PageShell
+      eyebrow="Shopping list"
+      title={data.list.listName}
+      subtitle="Add products, check off what is in the cart, and remove anything you no longer need."
+    >
       <ErrorMessage message={error} />
-
-      <h3>Add Item</h3>
-      <form onSubmit={handleAddItem}>
-        <select
-          name="productId"
-          value={productId}
-          onChange={(event) => setProductId(Number(event.target.value))}
-        >
-          <option value="" disabled>
-            Select a product
-          </option>
-          {data.allProducts.map((product) => (
-            <option key={product.productId} value={product.productId}>
-              {product.productName}
-            </option>
-          ))}
-        </select>
-        <input
-          name="quantity"
-          type="number"
-          value={quantity}
-          min="1"
-          onChange={(event) => setQuantity(Number(event.target.value))}
-        />
-        <button type="submit">Add</button>
-      </form>
-
-      <h3>Items</h3>
-      <table border={1}>
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Qty</th>
-            <th>Checked</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.items.map((item) => (
-            <tr key={item.itemId}>
-              <td>{item.productName}</td>
-              <td>{item.quantity}</td>
-              <td>{item.checked ? "Yes" : "No"}</td>
-              <td>
-                <button type="button" onClick={() => handleToggle(item.itemId, !item.checked)}>
-                  Toggle
-                </button>{" "}
-                <button type="button" onClick={() => handleRemove(item.itemId)}>
-                  Remove
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <Link href="/lists">Back to Lists</Link>
-    </main>
+      <AddItemForm
+        products={data.allProducts}
+        productId={productId}
+        quantity={quantity}
+        onProductChange={setProductId}
+        onQuantityChange={setQuantity}
+        onSubmit={handleAddItem}
+      />
+      <ListItemCollection items={data.items} onToggle={handleToggle} onRemove={handleRemove} />
+      <Link className="button-link secondary" href="/lists">
+        Back to lists
+      </Link>
+    </PageShell>
   );
 }

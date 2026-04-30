@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { login } from "@/services/login";
 import ErrorMessage from "@/components/shared/ErrorMessage";
+import PageShell from "@/components/shared/PageShell";
 import styles from "./LoginPage.module.css";
 
 export default function LoginPage() {
@@ -26,29 +27,40 @@ export default function LoginPage() {
   }
 
   return (
-    <main className={styles.page}>
-      <h2>Login</h2>
+    <PageShell
+      compact
+      showNav={false}
+      eyebrow="GrocerIQ"
+      title="Login"
+      subtitle="Sign in to continue tracking grocery prices."
+    >
       <ErrorMessage message={error} />
-      <form onSubmit={handleSubmit}>
-        <input
-          name="username"
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(event) => setUsername(event.target.value)}
-        />
-        <br />
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-        />
-        <br />
+      <form className={styles.authCard} onSubmit={handleSubmit}>
+        <label>
+          <span>Username</span>
+          <input
+            name="username"
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(event) => setUsername(event.target.value)}
+          />
+        </label>
+        <label>
+          <span>Password</span>
+          <input
+            name="password"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
+        </label>
         <button type="submit">Login</button>
       </form>
-      <Link href="/register">Register</Link>
-    </main>
+      <Link className={styles.authLink} href="/register">
+        Create an account
+      </Link>
+    </PageShell>
   );
 }

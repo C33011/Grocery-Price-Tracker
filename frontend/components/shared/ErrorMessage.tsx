@@ -1,11 +1,9 @@
+import StatusMessage from "./StatusMessage";
+
 type ErrorMessageProps = {
   message: string | null;
 };
 
 export default function ErrorMessage({ message }: ErrorMessageProps) {
-  if (!message) {
-    return null;
-  }
-
-  return <p>{message}</p>;
+  return <StatusMessage message={message} tone="error" />;
 }

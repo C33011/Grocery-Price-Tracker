@@ -1,1 +1,147 @@
-.page { }
+.filterPanel {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-surface);
+}
+
+.filterPanel label {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.filterPanel span {
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+  gap: var(--space-4);
+}
+
+.productCard {
+  display: grid;
+  align-content: space-between;
+  gap: var(--space-4);
+  min-height: 285px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-surface);
+}
+
+.selectedCard {
+  background: var(--color-plum-soft);
+}
+
+.selectControl {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-plum);
+  font-weight: 900;
+}
+
+.selectControl input {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--color-plum);
+  box-shadow: none;
+}
+
+.productCopy {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.productCopy p {
+  margin: 0;
+  color: var(--color-plum);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.productCopy h3 {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: 1.35rem;
+  line-height: 1.12;
+}
+
+.productMeta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.productMeta div {
+  border-radius: var(--radius-md);
+  background: var(--color-surface-soft);
+  padding: var(--space-3);
+}
+
+.productMeta dt {
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.productMeta dd {
+  margin: var(--space-1) 0 0;
+  color: var(--color-ink);
+  font-weight: 800;
+}
+
+.addBar {
+  position: sticky;
+  bottom: var(--space-4);
+  display: grid;
+  grid-template-columns: 1fr minmax(220px, 300px) auto;
+  align-items: center;
+  gap: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--color-plum-deep);
+  color: var(--color-bg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-surface);
+}
+
+.addCopy {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.addCopy strong {
+  font-size: 1.1rem;
+}
+
+.addCopy span {
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.addBar select {
+  background: var(--color-bg);
+}
+
+@media (max-width: 860px) {
+  .filterPanel,
+  .addBar {
+    grid-template-columns: 1fr;
+  }
+
+  .addBar {
+    position: static;
+  }
+}

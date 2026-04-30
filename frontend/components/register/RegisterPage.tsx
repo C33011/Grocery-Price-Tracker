@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { register } from "@/services/register";
 import ErrorMessage from "@/components/shared/ErrorMessage";
+import PageShell from "@/components/shared/PageShell";
 import styles from "./RegisterPage.module.css";
 
 export default function RegisterPage() {
@@ -33,25 +34,44 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className={styles.page}>
-      <h2>Register</h2>
+    <PageShell
+      compact
+      showNav={false}
+      eyebrow="GrocerIQ"
+      title="Register"
+      subtitle="Create an account for grocery price tracking."
+    >
       <ErrorMessage message={error} />
-      <form onSubmit={handleSubmit}>
-        <input name="firstName" type="text" placeholder="First Name" />
-        <br />
-        <input name="lastName" type="text" placeholder="Last Name" />
-        <br />
-        <input name="username" type="text" placeholder="Username" />
-        <br />
-        <input name="email" type="email" placeholder="Email" />
-        <br />
-        <input name="password" type="password" placeholder="Password" />
-        <br />
-        <input name="passwordRepeat" type="password" placeholder="Repeat Password" />
-        <br />
+      <form className={styles.authCard} onSubmit={handleSubmit}>
+        <label>
+          <span>First name</span>
+          <input name="firstName" type="text" placeholder="First name" />
+        </label>
+        <label>
+          <span>Last name</span>
+          <input name="lastName" type="text" placeholder="Last name" />
+        </label>
+        <label>
+          <span>Username</span>
+          <input name="username" type="text" placeholder="Username" />
+        </label>
+        <label>
+          <span>Email</span>
+          <input name="email" type="email" placeholder="Email" />
+        </label>
+        <label>
+          <span>Password</span>
+          <input name="password" type="password" placeholder="Password" />
+        </label>
+        <label>
+          <span>Repeat password</span>
+          <input name="passwordRepeat" type="password" placeholder="Repeat password" />
+        </label>
         <button type="submit">Register</button>
       </form>
-      <Link href="/login">Back to Login</Link>
-    </main>
+      <Link className={styles.authLink} href="/login">
+        Back to login
+      </Link>
+    </PageShell>
   );
 }

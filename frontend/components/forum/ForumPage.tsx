@@ -6,8 +6,11 @@ import { isUnauthorizedError } from "@/lib/api";
 import { createPost, getForum } from "@/services/forum";
 import type { ForumData } from "@/types/forum";
 import ErrorMessage from "@/components/shared/ErrorMessage";
-import Nav from "@/components/shared/Nav";
-import styles from "./ForumPage.module.css";
+import LoadingState from "@/components/shared/LoadingState";
+import PageShell from "@/components/shared/PageShell";
+import SectionHeader from "@/components/shared/SectionHeader";
+import ForumPostList from "./ForumPostList";
+import PostComposer from "./PostComposer";
 
 export default function ForumPage() {
   const router = useRouter();
@@ -54,49 +57,31 @@ export default function ForumPage() {
 
   if (!data) {
     return (
-      <main className={styles.page}>
+      <PageShell>
         <ErrorMessage message={error} />
-        {!error && <p>Loading...</p>}
-      </main>
+        {!error && <LoadingState title="Loading forum posts" />}
+      </PageShell>
     );
   }
 
   return (
-    <main className={styles.page}>
-      <Nav />
-      <h2>Community Forum</h2>
+    <PageShell
+      eyebrow="Community"
+      title="Forum"
+      subtitle="Share local grocery notes, price sightings, and practical shopping context."
+    >
       <ErrorMessage message={error} />
-
-      <h3>New Post</h3>
-      <form onSubmit={handleCreatePost}>
-        <input
-          name="title"
-          type="text"
-          placeholder="Title"
-          value={title}
-          onChange={(event) => setTitle(event.target.value)}
+      <section>
+        <SectionHeader title="New post" description="Add a concise update for other shoppers." />
+        <PostComposer
+          title={title}
+          body={body}
+          onTitleChange={setTitle}
+          onBodyChange={setBody}
+          onSubmit={handleCreatePost}
         />
-        <br />
-        <textarea
-          name="body"
-          rows={4}
-          cols={50}
-          placeholder="Body"
-          value={body}
-          onChange={(event) => setBody(event.target.value)}
-        />
-        <br />
-        <button type="submit">Post</button>
-      </form>
-
-      <h3>Posts</h3>
-      {data.posts.map((post) => (
-        <article key={post.postId}>
-          <strong>{post.title}</strong> by {post.username} at {post.postedAt}
-          <br />
-          {post.body}
-        </article>
-      ))}
-    </main>
+      </section>
+      <ForumPostList posts={data.posts} />
+    </PageShell>
   );
 }

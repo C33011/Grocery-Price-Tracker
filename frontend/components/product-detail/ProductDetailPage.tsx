@@ -7,8 +7,10 @@ import { isUnauthorizedError } from "@/lib/api";
 import { getProductDetail } from "@/services/product-detail";
 import type { ProductDetailData } from "@/types/product-detail";
 import ErrorMessage from "@/components/shared/ErrorMessage";
-import Nav from "@/components/shared/Nav";
-import styles from "./ProductDetailPage.module.css";
+import LoadingState from "@/components/shared/LoadingState";
+import PageShell from "@/components/shared/PageShell";
+import PriceHistoryList from "./PriceHistoryList";
+import ProductSummary from "./ProductSummary";
 
 type ProductDetailPageProps = {
   productId: number;
@@ -37,50 +39,25 @@ export default function ProductDetailPage({ productId }: ProductDetailPageProps)
 
   if (!data) {
     return (
-      <main className={styles.page}>
+      <PageShell>
         <ErrorMessage message={error} />
-        {!error && <p>Loading...</p>}
-      </main>
+        {!error && <LoadingState title="Loading product prices" />}
+      </PageShell>
     );
   }
 
   return (
-    <main className={styles.page}>
-      <Nav />
+    <PageShell
+      eyebrow={data.product.category}
+      title={data.product.productName}
+      subtitle="Review product details and historical pricing by store."
+    >
       <ErrorMessage message={error} />
-      <h2>{data.product.productName}</h2>
-      <p>Category: {data.product.category}</p>
-      <p>Brand: {data.product.brand}</p>
-      <p>
-        Size: {data.product.unitSize} {data.product.unitType}
-      </p>
-
-      <h3>Price History</h3>
-      <table border={1}>
-        <thead>
-          <tr>
-            <th>Store</th>
-            <th>Chain</th>
-            <th>Price</th>
-            <th>Reg Price</th>
-            <th>On Sale</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.prices.map((price) => (
-            <tr key={price.recordId}>
-              <td>{price.storeName}</td>
-              <td>{price.chain}</td>
-              <td>${price.price}</td>
-              <td>${price.regPrice}</td>
-              <td>{price.sale ? "Yes" : "No"}</td>
-              <td>{price.priceDate}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <Link href="/products">Back to Products</Link>
-    </main>
+      <ProductSummary product={data.product} />
+      <PriceHistoryList prices={data.prices} />
+      <Link className="button-link secondary" href="/products">
+        Back to products
+      </Link>
+    </PageShell>
   );
 }
