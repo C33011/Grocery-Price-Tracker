@@ -12,8 +12,17 @@ export type PriceRecord = {
   priceDate: string;
 };
 
+export type MonthlyPoint = {
+  month: string; 
+  avgPrice: number; 
+}; 
+
 export type ProductDetailData = {
   loggedInUser: User;
   product: Product;
   prices: PriceRecord[];
+  weekHigh: number | null; 
+  weeklow: number | null; 
+  predictedPrice: number | null; 
+  monthlyHistory: MonthlyPoint[];
 };

@@ -11,6 +11,8 @@ import LoadingState from "@/components/shared/LoadingState";
 import PageShell from "@/components/shared/PageShell";
 import PriceHistoryList from "./PriceHistoryList";
 import ProductSummary from "./ProductSummary";
+import PriceStatsBar from "./PriceStatsBar";
+import MonthlyHistoryChart from "./MonthlyHistoryChart";
 
 type ProductDetailPageProps = {
   productId: number;
@@ -54,6 +56,12 @@ export default function ProductDetailPage({ productId }: ProductDetailPageProps)
     >
       <ErrorMessage message={error} />
       <ProductSummary product={data.product} />
+      <PriceStatsBar
+        weekHigh={data.weekHigh}
+        weekLow={data.weekLow}
+        predictedPrice={data.predictedPrice}
+      />
+      <MonthlyHistoryChart history={data.monthlyHistory} />
       <PriceHistoryList prices={data.prices} />
       <Link className="button-link secondary" href="/products">
         Back to products
