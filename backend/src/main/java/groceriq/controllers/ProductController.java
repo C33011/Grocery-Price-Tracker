@@ -1,11 +1,13 @@
 package groceriq.controllers;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 import javax.sql.DataSource;
 
@@ -160,7 +162,11 @@ public class ProductController {
                 "pr.price, pr.reg_price, pr.is_sale, pr.price_date " +
                 "FROM price_records pr JOIN stores s ON pr.store_id = s.store_id " +
                 "WHERE pr.product_id = ? " +
-                "ORDER BY pr.price_date DESC LIMIT 20";
+                "AND pr.price_date = (" + 
+                "   SELECT MAX(pr2.price_date) FROM price_records pr2 "  + 
+                "   WHERE pr2.product_id = pr.product_id AND pr2.store_id = pr.store_id" + 
+                ") " + 
+                "ORDER BY pr.price_date ASC";
             List<PriceRecord> prices = new ArrayList<>();
             try (PreparedStatement pstmt = conn.prepareStatement(pricesSql)) {
                 pstmt.setInt(1, productId);
@@ -180,10 +186,30 @@ public class ProductController {
                     }
                 }
             }
-            return ResponseEntity.ok(Map.of(
-                    "loggedInUser", userService.getLoggedInUser(),
-                    "product", product,
-                    "prices", prices));
+            BigDecimal weekHigh = null; 
+            BigDecimal weekLow = null; 
+            String statsSql = 
+                "SELECT MIN(price) AS week_low, MAX(price) AS week_high " + 
+                "FROM price_records " + 
+                "WHERE product_id = ? " + 
+                "AND price_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)"; 
+            try (PreparedStatement pstmt = conn.prepareStatement(statsSql)) {
+                pstmt.setInt(1, productId); 
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (rs.next()) {
+                        weekLow = rs.getBigDecimal("week_low"); 
+                        weekHigh = rs.getBigDecimal("week_high"); 
+                    }
+                }
+            }
+
+            Map<String, Object> response = new HashMap<> (); 
+            response.put("loggedInUser", userService.getLoggedInUser());
+            response.put("product",     product); 
+            response.put("prices",      prices); 
+            response.put("weekHigh",    weekHigh); 
+            response.put("weekLow",     weekLow); 
+            return ResponseEntity.ok(response); 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", e.getMessage()));
