@@ -202,6 +202,24 @@ public class ProductController {
                     }
                 }
             }
+            List<Map<String, Object>> monthlyHistory = new ArrayList<>(); 
+            String histSql = 
+                "SELECT DATE_FORMAT(price_date, '%Y-%m') AS month, AVG(price) AS avg_price " + 
+                "FROM price_records " + 
+                "WHERE product_id = ? " + 
+                "AND price_date >= DATE_SUB(CURDATE(), INTERVAL 24 MONTH) " + 
+                "GROUP BY month ORDER BY month ASC"; 
+            try (PreparedStatement pstmt = conn.prepareStatement(histSql)) { 
+                pstmt.setInt(1, productId); 
+                try (ResultSet rs = pstmt.executeQuery()) { 
+                    while (rs.next()) {
+                        Map<String, Object> point = new HashMap<>(); 
+                        point.put("month", rs.getString("month")); 
+                        point.put("avgPrice", rs.getBigDecimal("avg_price")); 
+                        monthlyHistory.add(point); 
+                    }
+                }
+            }
 
             Map<String, Object> response = new HashMap<> (); 
             response.put("loggedInUser", userService.getLoggedInUser());
@@ -209,6 +227,7 @@ public class ProductController {
             response.put("prices",      prices); 
             response.put("weekHigh",    weekHigh); 
             response.put("weekLow",     weekLow); 
+            response.put("monthlyHistory", monthlyHistory); 
             return ResponseEntity.ok(response); 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
