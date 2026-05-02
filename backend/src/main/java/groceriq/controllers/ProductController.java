@@ -221,13 +221,36 @@ public class ProductController {
                 }
             }
 
+            Double predictedPrice = null; 
+            int n = monthlyHistory.size(); 
+            if (n >= 2) { 
+                double sumX = 0,  sumY = 0, sumXY = 0, sumX2 = 0; 
+                for (int i = 0; i < n; i++) { 
+                    double x = i; 
+                    double y = ((BigDecimal) monthlyHistory.get(i).get("avgPrice")).doubleValue(); 
+                    sumX += x; 
+                    sumY += y; 
+                    sumXY += x * y; 
+                    sumX2 += x * x;
+                }
+                double denom = n * sumX2 - sumX * sumX; 
+                if (denom != 0) { 
+                    double slope        = (n * sumXY - sumX * sumY) /denom; 
+                    double intercept    = (sumY - slope * sumX) / n; 
+                    predictedPrice      = Math.round((slope * n + intercept) * 100.0) / 100.0; 
+                }
+            
+                }
+    
+
             Map<String, Object> response = new HashMap<> (); 
             response.put("loggedInUser", userService.getLoggedInUser());
-            response.put("product",     product); 
-            response.put("prices",      prices); 
-            response.put("weekHigh",    weekHigh); 
-            response.put("weekLow",     weekLow); 
-            response.put("monthlyHistory", monthlyHistory); 
+            response.put("product",         product); 
+            response.put("prices",          prices); 
+            response.put("weekHigh",        weekHigh); 
+            response.put("weekLow",         weekLow); 
+            response.put("monthlyHistory",  monthlyHistory); 
+            response.put("predictedPrice",  predictedPrice); 
             return ResponseEntity.ok(response); 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -236,4 +259,5 @@ public class ProductController {
     }
 
     public record AddToListRequest(int listId, List<Integer> productIds) {}
+
 }
