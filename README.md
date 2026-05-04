@@ -14,7 +14,7 @@
     Frontend styling changes and react/nextjs implementation, README.md
   
 - Tate Matthews
-    Program File Organization and initial code creation, Signup/Login implementation, prelim.pdf
+    Implemented Spring Project Structure, Auth Service, Basic UI, wiring SQL Queries with prepared statements, GitHub Setup, Sample Data Creation, Signup/Login implementation, prelim.pdf
 
 ## Technologies
 - JDBC
