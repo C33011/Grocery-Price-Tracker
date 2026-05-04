@@ -29,9 +29,9 @@
 - MySQL running on `localhost:33306`
 
 ## JDBC Info
--DB Name: grocery_tracker (mysql://localhost:33306/grocery_tracker using 'mysql-server-x370' docker container)
--DB Username: root
--DB Password: mysqlpass
+- DB Name: grocery_tracker (mysql://localhost:33306/grocery_tracker using 'mysql-server-x370' docker container)
+- DB Username: root
+- DB Password: mysqlpass
 
 ## Database
 ```bash
