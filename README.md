@@ -17,10 +17,10 @@
     Program File Organization and initial code creation, Signup/Login implementation, prelim.pdf
 
 ## Technologies
--JDBC
--BCrypt
--React
--NextJs
+- JDBC
+- BCrypt
+- React
+- NextJs
     
 ## Requirements
 - Java 17+
