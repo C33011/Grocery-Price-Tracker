@@ -1,0 +1,73 @@
+Data Source Description
+=======================
+
+Project: GrocerIQ — Grocery Price Tracker & Smart Shopping List
+
+
+Overview
+--------
+All of the data in GrocerIQ is synthetic. We didn't collect any real transaction  
+records or store pricing data. To make the prices feel realistic, we used 
+publicly available consumer price index (CPI) data from the U.S.
+Bureau of Labor Statistics (BLS) as a reference
+for what grocery prices and price ranges generally look like. 
+
+
+Stores (15 rows — stores table)
+---------------------------------
+We created 15 store locations across four chains that are common in the Atlanta, Georgia
+area: Kroger (4 locations), Publix (4 locations), Walmart (4 locations), and Aldi
+(3 locations). The store names and ZIP codes are based on real locations, but the prices
+we assigned to them are synthetic and don't reflect what those stores actually
+charge.
+
+
+Products (50 rows — products table)
+--------------------------------------
+We defined 50 products across seven categories: Dairy, Produce, Meat, Bakery, Beverages,
+Frozen, and Pantry. We tried to pick things that represent a fairly normal grocery run.
+The brand names (like Chobani, Tillamook, Eggland's Best) are real brands we used to make
+the product catalog feel authentic, but none of the price data came from
+those companies.
+
+
+Price Records (13,500 rows — price_records table)
+---------------------------------------------------
+This is the main dataset that drives the app. Each row is the price of one product at
+one store for one month. We generated records to cover:
+
+  - Date range:  November 2024 through April 2026 (18 months)
+  - Coverage:    All 50 products x 15 stores x 18 months = 13,500 records
+
+A few things we did to make the data behave realistically:
+  - Base prices were set using BLS-informed ranges per category
+  - We applied +/-2-5% month-over-month variation to simulate normal price movement
+  - About 15% of records are flagged is_sale = TRUE, with prices discounted 10-25%
+    below that store's regular price (reg_price) for that product
+  - reg_price stays mostly stable across months with only small drift, to represent
+    the normal shelf price that sale prices are compared against
+
+
+Users (5 rows — users table)
+------------------------------
+We seeded 5 test users for demo purposes. 
+  Username     Password
+  ----------   --------
+  testuser1    pass1
+  testuser2    pass2
+  admin        adminpass
+  jdoe         pass123
+  mwilson      pass456
+
+
+Posts (seeded via test_Data(starter).sql)
+------------------------------------------
+A few sample forum posts are included in the starter data file so the Community Forum
+page isn't empty on first load.
+
+
+Files
+------
+  ddl.sql                  Schema (CREATE TABLE statements + indexes)
+  data.sql                 Full seed dataset (stores, products, price_records, users)
+  test_Data(starter).sql   Starter data (sample forum posts and list items)
