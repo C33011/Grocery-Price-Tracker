@@ -56,4 +56,4 @@ npm run dev
 
 Runs at `http://localhost:3000` and proxies `/api/*` to Spring Boot.
 
-Demo logins: `testuser1` / `pass1`, `testuser2` / `pass2`, `admin` / `password`
+Demo logins: `testuser1` / `pass1`, `testuser2` / `pass2`, `admin` / `adminpass`
